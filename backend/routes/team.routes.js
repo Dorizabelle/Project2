@@ -7,7 +7,22 @@ const rounds = 10
 const jwt = require('jsonwebtoken')
 const tokenSecret = "my-token-secret"
 
-const middleware = require('../middlewares')
+// const middleware = require('../middlewares')
+
+router.get('/array', (req, res) => {
+    Team.findOne({ name: req.body.name })
+        .then(team => {
+            if (!team) res.status(404).json({ error: 'no Team with that name found' })
+            else {
+                const clues = team.clues_found
+                const number = clues.length
+                res.status(200).json("Number of clues " + team.name + " found: " + String(number))
+            }
+        })
+        .catch(error => {
+            res.status(500).json(error)
+        })
+});
 
 router.post('/clue', (req, res) => {
     Team.findOne({ name: req.body.name })
@@ -45,14 +60,14 @@ router.post('/signup', (req, res) => {
             if (!team) {
                 newTeam.save()
                     .then(team => {
-                        res.status(200).json(newTeam)
+                        res.status(200).json("Team Created: " + team.name)
                     })
                     .catch(error => {
                         res.status(500).json(error)
                     })
             }
             else {
-                res.status(403).json({ error: 'Team Name Already Exsits' })
+                res.status(200).json('Team Name Already Exsits')
             }
         })
         .catch(error => {
